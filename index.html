@@ -1,0 +1,1103 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f5f8ff">
+
+    <title>UMA vs NUMA | Memory Architecture Lab</title>
+
+    <meta name="description"
+        content="An interactive learning lab exploring UMA and NUMA multiprocessor memory architectures, memory access latency, cache coherence, scalability, and performance.">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="site-header">
+        <nav class="navbar container">
+            <a class="brand" href="#home">
+                <span class="brand-icon">M</span>
+                <span>Memory<span class="brand-highlight">Lab</span></span>
+            </a>
+
+            <div class="nav-links">
+                <a href="#fundamentals">Fundamentals</a>
+                <a href="#uma">UMA</a>
+                <a href="#numa">NUMA</a>
+                <a href="#comparison">Comparison</a>
+            </div>
+
+            <a href="#explore" class="nav-button">Explore Lab ↗</a>
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- Hero -->
+        <section class="hero section" id="home">
+            <div class="container hero-grid">
+
+                <div class="hero-content">
+                    <div class="eyebrow">
+                        <span class="status-dot"></span>
+                        COMPUTER ORGANIZATION & ARCHITECTURE
+                    </div>
+
+                    <h1>
+                        Understanding
+                        <span class="gradient-text">UMA vs NUMA</span>
+                        Memory Architecture
+                    </h1>
+
+                    <p class="hero-description">
+                        How do multiple processors access memory? Why does
+                        memory location affect performance? Explore two
+                        important multiprocessor architectures through clear
+                        explanations, practical examples, and interactive
+                        visualizations.
+                    </p>
+
+                    <div class="hero-actions">
+                        <a class="button button-primary" href="#fundamentals">
+                            Start Learning →
+                        </a>
+                        <a class="button button-secondary" href="#comparison">
+                            Compare Architectures
+                        </a>
+                    </div>
+
+                    <div class="hero-facts">
+                        <div>
+                            <strong>UMA</strong>
+                            <span>Uniform access time</span>
+                        </div>
+                        <div>
+                            <strong>NUMA</strong>
+                            <span>Location-dependent access</span>
+                        </div>
+                        <div>
+                            <strong>COA</strong>
+                            <span>Memory organization</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-visual">
+                    <div class="visual-heading">
+                        <span>MEMORY ACCESS OVERVIEW</span>
+                        <span class="live-label">Conceptual model</span>
+                    </div>
+
+                    <div class="architecture-preview">
+                        <div class="preview-processors">
+                            <div class="processor-chip">
+                                <span class="chip-symbol">CPU</span>
+                                <strong>Processor 1</strong>
+                            </div>
+                            <div class="processor-chip">
+                                <span class="chip-symbol">CPU</span>
+                                <strong>Processor 2</strong>
+                            </div>
+                            <div class="processor-chip">
+                                <span class="chip-symbol">CPU</span>
+                                <strong>Processor 3</strong>
+                            </div>
+                        </div>
+
+                        <div class="preview-connection">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+
+                        <div class="shared-memory-box">
+                            <span class="memory-icon">▤</span>
+                            <strong>Shared Main Memory</strong>
+                            <small>One shared address space</small>
+                        </div>
+
+                        <p class="visual-caption">
+                            UMA concept: processors share main memory with
+                            approximately uniform memory-access latency.
+                        </p>
+                    </div>
+
+                    <div class="visual-note">
+                        <span class="note-icon">i</span>
+                        <p>
+                            The diagrams illustrate the concepts, not a
+                            specific commercial processor design.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Learning outcomes -->
+        <section class="learning-strip">
+            <div class="container learning-strip-grid">
+                <div>
+                    <span class="strip-number">01</span>
+                    <span>Understand the architecture</span>
+                </div>
+                <div>
+                    <span class="strip-number">02</span>
+                    <span>Trace memory access</span>
+                </div>
+                <div>
+                    <span class="strip-number">03</span>
+                    <span>Evaluate performance</span>
+                </div>
+                <div>
+                    <span class="strip-number">04</span>
+                    <span>Apply the concepts</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Fundamentals -->
+        <section class="section" id="fundamentals">
+            <div class="container">
+                <div class="section-heading">
+                    <span class="eyebrow">01 / THE BASICS</span>
+                    <h2>First, understand the problem</h2>
+                    <p>
+                        Before comparing UMA and NUMA, it helps to understand
+                        why memory access becomes an important design issue
+                        when a computer has multiple processors.
+                    </p>
+                </div>
+
+                <div class="content-grid three-columns">
+                    <article class="info-card">
+                        <div class="card-icon icon-blue">01</div>
+                        <h3>What is a processor?</h3>
+                        <p>
+                            A processor executes instructions, performs
+                            calculations, and coordinates operations. A
+                            multiprocessor system contains two or more
+                            processing units that can work on different
+                            tasks at the same time.
+                        </p>
+                    </article>
+
+                    <article class="info-card">
+                        <div class="card-icon icon-purple">02</div>
+                        <h3>Why is main memory needed?</h3>
+                        <p>
+                            Main memory stores the programs and data that
+                            processors need while executing tasks. When a
+                            processor requires data that is not available
+                            in its cache, it may need to access main memory.
+                        </p>
+                    </article>
+
+                    <article class="info-card">
+                        <div class="card-icon icon-green">03</div>
+                        <h3>Why does architecture matter?</h3>
+                        <p>
+                            If several processors compete for memory
+                            bandwidth or use different routes to reach data,
+                            performance can change. The memory architecture
+                            determines how processors access memory and how
+                            the system can grow.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="concept-panel">
+                    <div class="concept-panel-label">KEY CONCEPT</div>
+                    <h3>Memory latency is not the same as memory bandwidth.</h3>
+                    <div class="concept-columns">
+                        <div>
+                            <strong>Latency</strong>
+                            <p>
+                                The time taken for a memory request to begin
+                                returning the requested data.
+                            </p>
+                        </div>
+                        <div>
+                            <strong>Bandwidth</strong>
+                            <p>
+                                The amount of data that can be transferred
+                                over a period of time.
+                            </p>
+                        </div>
+                    </div>
+                    <p class="small-note">
+                        Both matter. A system can have high bandwidth but
+                        still experience delays for individual memory requests.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- UMA -->
+        <section class="section section-tinted" id="uma">
+            <div class="container">
+                <div class="section-heading">
+                    <span class="eyebrow">02 / ARCHITECTURE A</span>
+                    <h2>UMA — Uniform Memory Access</h2>
+                    <p>
+                        A shared-memory architecture in which processors
+                        generally experience approximately uniform access
+                        latency to main memory under comparable conditions.
+                    </p>
+                </div>
+
+                <div class="architecture-layout">
+                    <div class="architecture-explanation">
+                        <h3>How UMA is organized</h3>
+                        <p>
+                            In a typical UMA system, multiple processors
+                            connect to a common main-memory system through
+                            an interconnect. The processors share a single
+                            physical memory system and can access data in
+                            the shared address space.
+                        </p>
+
+                        <h4>How a memory request works</h4>
+                        <ol class="step-list">
+                            <li>
+                                <strong>The processor requests data.</strong>
+                                <p>
+                                    It checks its cache and requests the data
+                                    from memory if necessary.
+                                </p>
+                            </li>
+                            <li>
+                                <strong>The request reaches the memory system.</strong>
+                                <p>
+                                    The interconnect carries the request to
+                                    the appropriate memory controller or
+                                    shared memory resource.
+                                </p>
+                            </li>
+                            <li>
+                                <strong>Memory returns the data.</strong>
+                                <p>
+                                    The requested data travels back to the
+                                    processor so its instructions can continue.
+                                </p>
+                            </li>
+                        </ol>
+
+                        <h4>Important characteristics</h4>
+                        <ul class="feature-list">
+                            <li>Shared main-memory address space</li>
+                            <li>Approximately uniform memory-access latency</li>
+                            <li>Relatively straightforward programming model</li>
+                            <li>Shared resources may become bottlenecks as demand grows</li>
+                        </ul>
+                    </div>
+
+                    <div class="diagram-card">
+                        <div class="diagram-card-heading">
+                            <strong>UMA architecture</strong>
+                            <span class="diagram-tag">Conceptual diagram</span>
+                        </div>
+
+                        <div class="uma-diagram">
+                            <div class="cpu-row">
+                                <div class="cpu-box">CPU 1</div>
+                                <div class="cpu-box">CPU 2</div>
+                                <div class="cpu-box">CPU 3</div>
+                            </div>
+
+                            <div class="bus-lines">
+                                <span></span>
+                                <strong>Shared interconnect</strong>
+                                <span></span>
+                            </div>
+
+                            <div class="memory-block">
+                                <span class="memory-symbol">▤</span>
+                                <strong>Main Memory</strong>
+                                <small>Shared address space</small>
+                            </div>
+
+                            <div class="diagram-footnote">
+                                The exact interconnect and memory-controller
+                                implementation varies by system.
+                            </div>
+                        </div>
+
+                        <div class="analogy-box">
+                            <strong>Think of it like a shared kitchen.</strong>
+                            <p>
+                                Several cooks can use the same kitchen.
+                                Everyone can reach the common ingredients
+                                through the same shared facility, but if
+                                everyone needs the kitchen at once, congestion
+                                can slow the work down.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-grid three-columns detail-cards">
+                    <article class="info-card">
+                        <h3>Advantages</h3>
+                        <ul>
+                            <li>Simple shared-memory programming model</li>
+                            <li>Easy sharing of data between processors</li>
+                            <li>Useful for many small and medium-sized systems</li>
+                        </ul>
+                    </article>
+
+                    <article class="info-card">
+                        <h3>Limitations</h3>
+                        <ul>
+                            <li>Shared interconnect contention can increase</li>
+                            <li>Memory bandwidth may limit scaling</li>
+                            <li>Contention and cache coherence still need management</li>
+                        </ul>
+                    </article>
+
+                    <article class="info-card">
+                        <h3>Where is it useful?</h3>
+                        <p>
+                            UMA-like organization is common in many
+                            conventional shared-memory multiprocessor
+                            designs, especially where a single shared
+                            memory system is practical.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- NUMA -->
+        <section class="section" id="numa">
+            <div class="container">
+                <div class="section-heading">
+                    <span class="eyebrow">03 / ARCHITECTURE B</span>
+                    <h2>NUMA — Non-Uniform Memory Access</h2>
+                    <p>
+                        A shared-address-space architecture in which memory
+                        is physically distributed among nodes. Access to
+                        local memory is generally faster than access to
+                        memory attached to another node.
+                    </p>
+                </div>
+
+                <div class="architecture-layout">
+                    <div class="diagram-card">
+                        <div class="diagram-card-heading">
+                            <strong>NUMA architecture</strong>
+                            <span class="diagram-tag">Conceptual diagram</span>
+                        </div>
+
+                        <div class="numa-diagram">
+                            <div class="numa-node">
+                                <strong>NUMA Node 1</strong>
+                                <div class="node-cpu">CPU 1</div>
+                                <div class="node-memory">Local Memory 1</div>
+                                <small>Faster local access</small>
+                            </div>
+
+                            <div class="numa-interconnect">
+                                <span>Node interconnect</span>
+                                <div class="interconnect-arrows">↔</div>
+                            </div>
+
+                            <div class="numa-node">
+                                <strong>NUMA Node 2</strong>
+                                <div class="node-cpu">CPU 2</div>
+                                <div class="node-memory">Local Memory 2</div>
+                                <small>Faster local access</small>
+                            </div>
+
+                            <div class="diagram-footnote">
+                                In a typical cache-coherent NUMA system, nodes
+                                can access memory associated with other nodes,
+                                but remote access usually has greater latency.
+                            </div>
+                        </div>
+
+                        <div class="analogy-box">
+                            <strong>Think of nearby and distant kitchens.</strong>
+                            <p>
+                                Each team has its own kitchen and ingredients.
+                                A team can usually get ingredients from its
+                                own kitchen more quickly. If it needs something
+                                stored in another kitchen, someone must bring
+                                it from farther away.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="architecture-explanation">
+                        <h3>How NUMA is organized</h3>
+                        <p>
+                            A NUMA system is divided into nodes. Each node
+                            typically includes one or more processors, local
+                            memory, and an interface to the interconnect.
+                            The nodes work together as one system.
+                        </p>
+
+                        <h4>How a memory request works</h4>
+                        <ol class="step-list">
+                            <li>
+                                <strong>The processor requests data.</strong>
+                                <p>
+                                    The processor first checks its cache and
+                                    then requests the data from the memory
+                                    hierarchy.
+                                </p>
+                            </li>
+                            <li>
+                                <strong>The system identifies the memory location.</strong>
+                                <p>
+                                    If the data is in memory local to the
+                                    processor's node, the request can use
+                                    the local memory path.
+                                </p>
+                            </li>
+                            <li>
+                                <strong>Remote access uses the interconnect.</strong>
+                                <p>
+                                    If the data belongs to another node,
+                                    the request may cross the node
+                                    interconnect, increasing latency and
+                                    consuming interconnect bandwidth.
+                                </p>
+                            </li>
+                        </ol>
+
+                        <h4>Important characteristics</h4>
+                        <ul class="feature-list">
+                            <li>Memory is physically distributed across nodes</li>
+                            <li>Processors typically share a system-wide address space</li>
+                            <li>Local and remote memory access have different costs</li>
+                            <li>Can scale well when memory and workloads are placed carefully</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="content-grid three-columns detail-cards">
+                    <article class="info-card">
+                        <h3>Advantages</h3>
+                        <ul>
+                            <li>More distributed memory bandwidth</li>
+                            <li>Can support larger multiprocessor systems</li>
+                            <li>Local memory placement can improve performance</li>
+                        </ul>
+                    </article>
+
+                    <article class="info-card">
+                        <h3>Limitations</h3>
+                        <ul>
+                            <li>Remote memory requests can take longer</li>
+                            <li>Data placement can affect performance</li>
+                            <li>Operating-system and application tuning may be important</li>
+                        </ul>
+                    </article>
+
+                    <article class="info-card">
+                        <h3>Where is it useful?</h3>
+                        <p>
+                            NUMA is used in many multi-socket servers and
+                            large shared-memory systems where memory capacity
+                            and bandwidth must grow with processing resources.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Deeper concepts -->
+        <section class="section section-tinted" id="advanced">
+            <div class="container">
+                <div class="section-heading">
+                    <span class="eyebrow">04 / BEYOND THE BASICS</span>
+                    <h2>Concepts that make the difference</h2>
+                    <p>
+                        UMA and NUMA are not just about where memory is
+                        located. They also affect how processors communicate,
+                        how data is shared, and how software uses the hardware.
+                    </p>
+                </div>
+
+                <div class="content-grid two-columns">
+                    <article class="detail-card">
+                        <span class="detail-number">01</span>
+                        <h3>Cache coherence</h3>
+                        <p>
+                            Each processor may have its own cache containing
+                            copies of memory data. If one processor changes
+                            a shared value, another processor must not
+                            continue using an outdated copy when the
+                            architecture requires the change to be visible.
+                        </p>
+                        <p>
+                            Cache-coherence protocols help coordinate these
+                            copies. They are important in shared-memory
+                            multiprocessors, including many UMA and NUMA
+                            systems.
+                        </p>
+                    </article>
+
+                    <article class="detail-card">
+                        <span class="detail-number">02</span>
+                        <h3>Memory consistency</h3>
+                        <p>
+                            Cache coherence concerns the visibility of
+                            updates to a particular memory location.
+                            Memory consistency describes the rules governing
+                            the ordering and visibility of memory operations
+                            across processors.
+                        </p>
+                        <p>
+                            These rules matter when concurrent threads
+                            communicate through shared variables and
+                            synchronization mechanisms.
+                        </p>
+                    </article>
+
+                    <article class="detail-card">
+                        <span class="detail-number">03</span>
+                        <h3>Scalability</h3>
+                        <p>
+                            Scalability describes how effectively a system
+                            continues to perform as processing resources
+                            increase. Adding processors does not guarantee
+                            proportional speedup.
+                        </p>
+                        <p>
+                            Shared-resource contention can limit growth.
+                            NUMA can distribute memory resources across
+                            nodes, although remote accesses and interconnect
+                            traffic still matter.
+                        </p>
+                    </article>
+
+                    <article class="detail-card">
+                        <span class="detail-number">04</span>
+                        <h3>Memory affinity and placement</h3>
+                        <p>
+                            In NUMA systems, the location of data can
+                            influence access time. Keeping a thread's
+                            frequently used data near the processor running
+                            that thread is often beneficial.
+                        </p>
+                        <p>
+                            Operating systems can use policies such as
+                            first-touch allocation and thread affinity to
+                            influence placement. Results depend on the
+                            operating system, workload, and configuration.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="note-panel">
+                    <strong>Important distinction</strong>
+                    <p>
+                        NUMA does not mean that processors cannot access
+                        one another's memory. In a typical shared-address-space
+                        NUMA system, remote memory is accessible; it simply
+                        has a different performance cost. Also, not every
+                        NUMA system has identical cache-coherence features.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive lab -->
+        <section class="section" id="explore">
+            <div class="container">
+                <div class="section-heading">
+                    <span class="eyebrow">05 / INTERACTIVE LAB</span>
+                    <h2>See the architecture in action</h2>
+                    <p>
+                        Use this conceptual 3D view to explore processors,
+                        memory, and the paths data can travel. The animation
+                        is illustrative, not a cycle-accurate simulation of
+                        actual hardware.
+                    </p>
+                </div>
+
+                <div class="lab-panel">
+                    <div class="lab-toolbar">
+                        <div>
+                            <strong>Memory Architecture Explorer</strong>
+                            <p>Processors · Memory · Data paths</p>
+                        </div>
+
+                        <div class="lab-controls">
+                            <button class="mode-button active" id="uma-mode"
+                                type="button">UMA view</button>
+                            <button class="mode-button" id="numa-mode"
+                                type="button">NUMA view</button>
+                        </div>
+                    </div>
+
+                    <div id="three-container"
+                        aria-label="Interactive three-dimensional memory architecture visualization">
+                        <div class="visualization-fallback">
+                            The 3D visualization will appear here when
+                            JavaScript and WebGL are available.
+                        </div>
+                    </div>
+
+                    <p class="lab-caption" id="architecture-description">
+                        UMA view: multiple processors access a shared main
+                        memory system with approximately uniform access latency.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Comparison -->
+        <section class="section section-tinted" id="comparison">
+            <div class="container">
+                <div class="section-heading">
+                    <span class="eyebrow">06 / SIDE-BY-SIDE COMPARISON</span>
+                    <h2>UMA vs NUMA</h2>
+                    <p>
+                        The central difference is how memory is organized
+                        and how access costs vary with memory location.
+                    </p>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>UMA</th>
+                                <th>NUMA</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>Full form</th>
+                                <td>Uniform Memory Access</td>
+                                <td>Non-Uniform Memory Access</td>
+                            </tr>
+                            <tr>
+                                <th>Memory organization</th>
+                                <td>Typically a shared main-memory system</td>
+                                <td>Memory distributed across nodes</td>
+                            </tr>
+                            <tr>
+                                <th>Access latency</th>
+                                <td>Approximately uniform under comparable conditions</td>
+                                <td>Usually lower for local than remote memory</td>
+                            </tr>
+                            <tr>
+                                <th>Address space</th>
+                                <td>Shared in a typical UMA multiprocessor</td>
+                                <td>Shared in a typical cache-coherent NUMA system</td>
+                            </tr>
+                            <tr>
+                                <th>Scalability</th>
+                                <td>Shared resources may limit scaling</td>
+                                <td>Distributed memory resources can support scaling</td>
+                            </tr>
+                            <tr>
+                                <th>Data placement</th>
+                                <td>Location is generally less visible to software</td>
+                                <td>Placement can significantly affect performance</td>
+                            </tr>
+                            <tr>
+                                <th>Programming</th>
+                                <td>Often a simpler performance model</td>
+                                <td>May require NUMA-aware placement and tuning</td>
+                            </tr>
+                            <tr>
+                                <th>Typical use</th>
+                                <td>Many conventional shared-memory systems</td>
+                                <td>Many multi-socket servers and larger systems</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p class="table-note">
+                    These are general characteristics, not absolute rules.
+                    Real systems differ in cache hierarchy, interconnect,
+                    memory controllers, and topology.
+                </p>
+            </div>
+        </section>
+
+        <!-- Performance scenario -->
+        <section class="section" id="performance">
+            <div class="container">
+                <div class="section-heading">
+                    <span class="eyebrow">07 / PERFORMANCE IN PRACTICE</span>
+                    <h2>Why does memory placement matter?</h2>
+                    <p>
+                        Consider a server running several worker threads
+                        that repeatedly read and update data.
+                    </p>
+                </div>
+
+                <div class="content-grid two-columns">
+                    <article class="scenario-card scenario-uma">
+                        <span class="scenario-label">UMA SCENARIO</span>
+                        <h3>Shared memory resources</h3>
+                        <p>
+                            All processors access the shared memory system.
+                            If many processors generate requests at the same
+                            time, they may compete for memory bandwidth or
+                            interconnect resources.
+                        </p>
+                        <p>
+                            This does not mean every UMA system is slow.
+                            Performance depends on the hardware, cache
+                            behavior, and workload.
+                        </p>
+                    </article>
+
+                    <article class="scenario-card scenario-numa">
+                        <span class="scenario-label">NUMA SCENARIO</span>
+                        <h3>Locality-aware execution</h3>
+                        <p>
+                            A thread can benefit when the data it frequently
+                            uses is stored in memory local to its NUMA node.
+                            Local accesses can reduce latency and remote
+                            interconnect traffic.
+                        </p>
+                        <p>
+                            If the thread repeatedly accesses remote memory,
+                            or threads frequently migrate between nodes,
+                            the expected benefit may be reduced.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="formula-panel">
+                    <span class="eyebrow">A USEFUL PERFORMANCE IDEA</span>
+                    <h3>Execution time depends on more than processor count.</h3>
+                    <p>
+                        Actual performance also depends on instruction
+                        execution, cache hits and misses, memory latency,
+                        bandwidth, synchronization, and the amount of
+                        parallel work available.
+                    </p>
+                    <div class="formula">
+                        Performance ≠ Number of CPUs alone
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Swiggy analogy -->
+        <section class="section section-tinted" id="analogy">
+            <div class="container">
+                <div class="section-heading">
+                    <span class="eyebrow">08 / REAL-LIFE ANALOGY</span>
+                    <h2>Understand it through a delivery service</h2>
+                    <p>
+                        Imagine a food-delivery service coordinating several
+                        workers, kitchens, and ingredient stores. The analogy
+                        helps explain the idea, even though real computer
+                        memory systems are more complex.
+                    </p>
+                </div>
+
+                <div class="content-grid two-columns">
+                    <article class="analogy-card">
+                        <div class="analogy-illustration">🏢</div>
+                        <span class="analogy-label">UMA</span>
+                        <h3>One shared central kitchen</h3>
+                        <p>
+                            Several delivery teams use the same central
+                            kitchen. Everyone can request ingredients from
+                            the shared facility. If demand becomes very high,
+                            the kitchen or its access routes may become busy.
+                        </p>
+                        <div class="analogy-mapping">
+                            <div><span>Delivery teams</span><strong>Processors</strong></div>
+                            <div><span>Central kitchen</span><strong>Main memory</strong></div>
+                            <div><span>Shared access route</span><strong>Interconnect</strong></div>
+                        </div>
+                    </article>
+
+                    <article class="analogy-card">
+                        <div class="analogy-illustration">🏬</div>
+                        <span class="analogy-label">NUMA</span>
+                        <h3>Multiple local kitchens</h3>
+                        <p>
+                            Each team has a nearby kitchen, while kitchens
+                            can coordinate with one another. Local ingredients
+                            are quicker to obtain; getting ingredients from
+                            a distant kitchen may take more time.
+                        </p>
+                        <div class="analogy-mapping">
+                            <div><span>Delivery teams</span><strong>Processors</strong></div>
+                            <div><span>Local kitchens</span><strong>NUMA nodes</strong></div>
+                            <div><span>Nearby ingredients</span><strong>Local memory</strong></div>
+                        </div>
+                    </article>
+                </div>
+
+                <p class="analogy-disclaimer">
+                    Analogy takeaway: UMA emphasizes uniform memory-access
+                    cost, while NUMA makes memory locality an important
+                    performance consideration.
+                </p>
+            </div>
+        </section>
+
+        <!-- Applications -->
+        <section class="section" id="applications">
+            <div class="container">
+                <div class="section-heading">
+                    <span class="eyebrow">09 / APPLICATIONS</span>
+                    <h2>Where do these concepts matter?</h2>
+                    <p>
+                        Memory architecture becomes especially important
+                        when many processing threads access large amounts
+                        of shared data.
+                    </p>
+                </div>
+
+                <div class="content-grid three-columns">
+                    <article class="info-card">
+                        <div class="card-icon icon-blue">01</div>
+                        <h3>Database servers</h3>
+                        <p>
+                            Database engines may have many worker threads
+                            accessing indexes, caches, and large datasets.
+                            Memory placement can influence latency and
+                            throughput on NUMA machines.
+                        </p>
+                    </article>
+
+                    <article class="info-card">
+                        <div class="card-icon icon-purple">02</div>
+                        <h3>Virtualization and cloud</h3>
+                        <p>
+                            Hosts running many virtual machines must manage
+                            processor scheduling and memory allocation.
+                            NUMA awareness can help avoid unnecessary
+                            remote-memory traffic.
+                        </p>
+                    </article>
+
+                    <article class="info-card">
+                        <div class="card-icon icon-green">03</div>
+                        <h3>Scientific computing</h3>
+                        <p>
+                            Simulations and numerical applications may
+                            process large arrays across many threads.
+                            Memory bandwidth, data partitioning, and
+                            locality can affect overall execution time.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Misconceptions -->
+        <section class="section section-tinted" id="misconceptions">
+            <div class="container">
+                <div class="section-heading">
+                    <span class="eyebrow">10 / CLEAR UP THE CONFUSION</span>
+                    <h2>Common misconceptions</h2>
+                </div>
+
+                <div class="misconception-list">
+                    <article>
+                        <span class="misconception-mark">×</span>
+                        <div>
+                            <h3>“NUMA is always faster than UMA.”</h3>
+                            <p>
+                                Not necessarily. NUMA can provide scalability
+                                and local-memory advantages, but remote
+                                accesses, workload patterns, and placement
+                                decisions can affect performance.
+                            </p>
+                        </div>
+                    </article>
+
+                    <article>
+                        <span class="misconception-mark">×</span>
+                        <div>
+                            <h3>“UMA means memory access takes exactly the same time.”</h3>
+                            <p>
+                                Uniform means approximately uniform access
+                                latency under comparable conditions. Cache
+                                hits, contention, and other effects can
+                                still change observed latency.
+                            </p>
+                        </div>
+                    </article>
+
+                    <article>
+                        <span class="misconception-mark">×</span>
+                        <div>
+                            <h3>“NUMA nodes cannot access remote memory.”</h3>
+                            <p>
+                                In a typical shared-address-space NUMA system,
+                                remote memory is accessible through the
+                                interconnect, but it usually has a different
+                                latency and bandwidth cost.
+                            </p>
+                        </div>
+                    </article>
+
+                    <article>
+                        <span class="misconception-mark">×</span>
+                        <div>
+                            <h3>“More processors always mean proportional speedup.”</h3>
+                            <p>
+                                A workload may be limited by serial work,
+                                synchronization, memory bandwidth, or
+                                communication overhead. Additional processors
+                                do not remove those limits automatically.
+                            </p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+    
+<!-- REAL-WORLD CASE STUDY: SWIGGY -->
+<section id="swiggy-case-study" class="content-section">
+    <div class="section-heading">
+        <span class="section-tag">REAL-WORLD CASE STUDY</span>
+        <h2>How Swiggy Relates to UMA vs NUMA</h2>
+        <p>
+            Imagine Swiggy handling thousands of food orders at lunchtime.
+            The system needs to process orders, update delivery status,
+            calculate payments, and respond to users quickly.
+        </p>
+    </div>
+
+    <div class="swiggy-intro">
+        <h3>🍔 The Real-World Problem</h3>
+        <p>
+            During peak hours, many requests arrive at the same time.
+            If processors compete for shared memory or access data stored
+            near another processor, memory access can become a bottleneck.
+            This is where memory architecture becomes important.
+        </p>
+    </div>
+
+    <div class="swiggy-grid">
+        <article class="swiggy-card">
+            <h3>🔵 Scenario 1: UMA Architecture</h3>
+            <p>
+                Imagine several processors handling Swiggy orders while
+                accessing one shared main memory.
+            </p>
+            <ul>
+                <li>All processors share the same main memory.</li>
+                <li>Memory access time is designed to be approximately uniform.</li>
+                <li>Simple to manage for smaller systems.</li>
+                <li>Heavy shared-memory traffic can become a bottleneck.</li>
+            </ul>
+            <div class="case-result">
+                <strong>Possible challenge:</strong>
+                Many processors may compete for shared memory bandwidth
+                during peak order traffic.
+            </div>
+        </article>
+
+        <article class="swiggy-card">
+            <h3>🟢 Scenario 2: NUMA Architecture</h3>
+            <p>
+                Imagine a large server divided into nodes. Each node has
+                processors and its own local memory, while the nodes remain
+                connected.
+            </p>
+            <ul>
+                <li>Each node can access its local memory faster.</li>
+                <li>Processors can also access memory on other nodes.</li>
+                <li>Remote memory access generally has higher latency.</li>
+                <li>Placing frequently used data near the processors that need it can help.</li>
+            </ul>
+            <div class="case-result">
+                <strong>Possible benefit:</strong>
+                A NUMA-aware application can improve memory locality and
+                reduce unnecessary remote-memory access.
+            </div>
+        </article>
+    </div>
+
+    <div class="swiggy-analogy">
+        <h3>🍳 The Shared Kitchen Analogy</h3>
+        <p>
+            <strong>UMA:</strong> All chefs use one common kitchen storeroom.
+            It is easy to organize, but many chefs may wait to collect
+            ingredients from the same place.
+        </p>
+        <p>
+            <strong>NUMA:</strong> Each kitchen team has a nearby storeroom,
+            while ingredients can still be collected from other teams.
+            Nearby ingredients are quicker to access, but travelling to
+            another storeroom takes more time.
+        </p>
+    </div>
+
+    <div class="swiggy-takeaway">
+        <h3>💡 What Does This Teach Us?</h3>
+        <p>
+            For a large order-processing workload, NUMA can help when
+            software keeps frequently accessed data close to the processors
+            using it. However, NUMA does not automatically make every
+            application faster. Performance depends on workload, memory
+            placement, synchronization, and software design.
+        </p>
+        <p class="case-note">
+            Note: Swiggy is used here as an illustrative example of a
+            high-traffic application, not as a claim about Swiggy's actual
+            server architecture.
+        </p>
+    </div>
+</section>
+
+        <!-- Conclusion -->
+        <section class="section conclusion-section" id="conclusion">
+            <div class="container">
+                <div class="conclusion-card">
+                    <span class="eyebrow">11 / FINAL TAKEAWAY</span>
+                    <h2>One idea to remember</h2>
+                    <p>
+                        UMA is characterized by approximately uniform
+                        memory-access latency. NUMA distributes memory
+                        across nodes, so local and remote accesses have
+                        different costs. Understanding that difference
+                        helps explain how multiprocessor systems are
+                        designed and optimized.
+                    </p>
+
+                    <a class="button button-primary" href="#home">
+                        Back to Top ↑
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-content">
+            <a class="brand" href="#home">
+                <span class="brand-icon">M</span>
+                <span>Memory<span class="brand-highlight">Lab</span></span>
+            </a>
+
+            <p>
+                An educational project on UMA and NUMA memory architecture.
+            </p>
+
+            <a href="#fundamentals">Review the concepts ↑</a>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="script.js" defer></script>
+    <script src="three-scene.js" defer></script>
+
+</body>
+</html>
